@@ -12,7 +12,8 @@ import './components/addCartao.dart';
 import '../models/cartao.dart';
 
 class MostrarCartao extends StatefulWidget {
-  MostrarCartao({Key key, this.mes, this.data}) : super(key: key);
+  MostrarCartao({Key? key, required this.mes, required this.data})
+      : super(key: key);
   final String mes;
   final QueryDocumentSnapshot data;
   @override
@@ -21,7 +22,7 @@ class MostrarCartao extends StatefulWidget {
 }
 
 class _MostrarCartaoState extends State<MostrarCartao> {
-  _MostrarCartaoState({this.mes, this.data});
+  _MostrarCartaoState({required this.mes, required this.data});
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final String mes;
   final QueryDocumentSnapshot data;
@@ -44,10 +45,10 @@ class _MostrarCartaoState extends State<MostrarCartao> {
               }
 
               if (snapshot.hasError) {
-                return Center(child: Text(snapshot.error));
+                return Center(child: Text(snapshot.error as String));
               }
 
-              QuerySnapshot query = snapshot.data;
+              QuerySnapshot query = snapshot.data as QuerySnapshot;
               List<QueryDocumentSnapshot> docs = query.docs;
 
               return Scaffold(
@@ -68,19 +69,19 @@ class _MostrarCartaoState extends State<MostrarCartao> {
                       Card(
                         child: ExpandablePanel(
                           // ignore: deprecated_member_use
-                          hasIcon: false,
+                          // hasIcon: false,
                           header: Container(
                             decoration: BoxDecoration(
                                 color: Color(int.parse(
-                                    '0xff${doc.data()['style']['background']}')),
+                                    '0xff${(doc.data() as Map<String, dynamic>)['style']['background']}')),
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(5),
                                     topRight: Radius.circular(5))),
                             child: Text(
-                              doc.data()['nome'],
+                              (doc.data() as Map<String, dynamic>)['nome'],
                               style: TextStyle(
                                   color: Color(int.parse(
-                                      '0xff${doc.data()['style']['text']}')),
+                                      '0xff${(doc.data() as Map<String, dynamic>)['style']['text']}')),
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16),
                             ),
@@ -88,7 +89,7 @@ class _MostrarCartaoState extends State<MostrarCartao> {
                           ),
                           collapsed: Container(
                             child: Text(
-                              'Total: ${f.format(double.parse(doc.data()['total'].toString()))}',
+                              'Total: ${f.format(double.parse((doc.data() as Map<String, dynamic>)['total'].toString()))}',
                               style: TextStyle(fontSize: 16),
                             ),
                             padding: EdgeInsets.all(15),
@@ -100,7 +101,7 @@ class _MostrarCartaoState extends State<MostrarCartao> {
                                 trailing: IconButton(
                                   icon: CircleAvatar(
                                     backgroundColor: Color(int.parse(
-                                        '0xff${doc.data()['style']['background']}')),
+                                        '0xff${(doc.data() as Map<String, dynamic>)['style']['background']}')),
                                     child: Icon(
                                       Icons.add,
                                       color: Colors.white,
@@ -114,10 +115,12 @@ class _MostrarCartaoState extends State<MostrarCartao> {
                                             db.insertItemCartao(
                                                 mes, doc.id, itemCartao);
                                           } else {
-                                            Conta conta =
-                                                Conta.fromMap(data.data());
-                                            Cartao newCartao =
-                                                Cartao.fromJson(doc.data());
+                                            Conta conta = Conta.fromMap(
+                                                data.data()
+                                                    as Map<String, dynamic>);
+                                            Cartao newCartao = Cartao.fromJson(
+                                                doc.data()
+                                                    as Map<String, dynamic>);
                                             newCartao.addItem(itemCartao);
 
                                             Map<String, dynamic> res =
@@ -130,7 +133,7 @@ class _MostrarCartaoState extends State<MostrarCartao> {
                                   },
                                 ),
                                 title: Text(
-                                  'Total: ${f.format(double.parse(doc.data()['total'].toString()))}',
+                                  'Total: ${f.format(double.parse((doc.data() as Map<String, dynamic>)['total'].toString()))}',
                                   style: TextStyle(fontSize: 16),
                                 ),
                               )
@@ -148,7 +151,7 @@ class _MostrarCartaoState extends State<MostrarCartao> {
   Widget total(List<QueryDocumentSnapshot> docs) {
     double total = 0;
     for (var i in docs) {
-      total += i.data()['total'];
+      total += (i.data() as Map<String, dynamic>)['total'];
     }
     return GestureDetector(
       child: Padding(
@@ -172,16 +175,18 @@ class _MostrarCartaoState extends State<MostrarCartao> {
             ClipboardData(text: '${convert.doubleToCurrency(total)}'));
         // _scaffoldKey.currentState.showSnackBar(
         //     SnackBar(content: Text('${f.format(total)} copiado!')));
-        ScaffoldMessenger.of(_scaffoldKey.currentContext).showSnackBar(
+        ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
             SnackBar(content: Text('${f.format(total)} copiado!')));
       },
     );
   }
 
   List<Widget> itens(QueryDocumentSnapshot doc) {
-    Cartao cartao = Cartao.fromJson(doc.data());
+    Cartao cartao = Cartao.fromJson(doc.data() as Map<String, dynamic>);
     List<Widget> listaItens = [];
-    for (int i = 0; i < doc.data()['descricao'].length; i++)
+    for (int i = 0;
+        i < (doc.data() as Map<String, dynamic>)['descricao'].length;
+        i++)
       listaItens.add(ListTile(
         onLongPress: () {
           addCartao(

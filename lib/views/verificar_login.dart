@@ -1,7 +1,7 @@
+import 'package:financas/views/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../views/home.dart';
-import '../views/login_page.dart';
 
 class VerificarLogin extends StatefulWidget {
   @override
@@ -13,19 +13,13 @@ class _VerificarLoginState extends State<VerificarLogin> {
 
   @override
   Widget build(BuildContext context) {
-    User user = _auth.currentUser;
-    // print('${user.photoURL} \n ${user.uid}');
-    if (user == null) {
-      Future.delayed(Duration.zero, () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginPage()));
-      });
-    } else {
-      Future.delayed(Duration.zero, () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Home()));
-      });
-    }
+    User? user = _auth.currentUser;
+    Future.delayed(Duration.zero, () {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => user == null ? LoginPage() : Home()));
+    });
     return Container();
   }
 }

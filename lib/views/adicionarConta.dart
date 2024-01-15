@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 import './components/addConta.dart';
 
 class AdicionarConta extends StatefulWidget {
-  AdicionarConta({Key key, this.id, this.mes, this.ano}) : super(key: key);
+  AdicionarConta(
+      {Key? key, required this.id, required this.mes, required this.ano})
+      : super(key: key);
   final String id;
   final String mes;
   final int ano;
@@ -15,7 +17,8 @@ class AdicionarConta extends StatefulWidget {
 }
 
 class _AdicionarContaState extends State<AdicionarConta> {
-  _AdicionarContaState({this.id, this.mes, this.ano});
+  _AdicionarContaState(
+      {required this.id, required this.mes, required this.ano});
   final String id;
   final String mes;
   final int ano;
@@ -93,7 +96,7 @@ class _AdicionarContaState extends State<AdicionarConta> {
               setState(() {
                 items = [
                   ItemConta(icon: {
-                    'code': Icons.water_damage.codePoint,
+                    'code': Icons.water_drop_sharp.codePoint,
                     'color': '2196f3'
                   }, nome: 'Água', valor: 34.27),
                   ItemConta(icon: {
@@ -105,8 +108,8 @@ class _AdicionarContaState extends State<AdicionarConta> {
                     'color': '3f51b5'
                   }, nome: 'Internet', valor: 75),
                   ItemConta(icon: {
-                    'code': Icons.electrical_services.codePoint,
-                    'color': '2196f3'
+                    'code': Icons.lightbulb_rounded.codePoint,
+                    'color': 'f4511e'
                   }, nome: 'Luz', valor: 100.14),
                   ItemConta(
                       icon: {'code': Icons.moped.codePoint, 'color': 'f44336'},
@@ -122,7 +125,8 @@ class _AdicionarContaState extends State<AdicionarConta> {
                       valor: 40.00)
                 ];
                 _index = 0;
-                print('ok');
+                print(Icons.lightbulb_sharp.codePoint);
+                print(Icons.lightbulb_rounded.codePoint);
               });
               break;
             case 1:
@@ -133,7 +137,8 @@ class _AdicionarContaState extends State<AdicionarConta> {
               break;
             case 2:
               db
-                  .insertConta(id, Conta(ano: ano, mes: mes, items: items))
+                  .insertConta(
+                      id, Conta(ano: ano, mes: mes, items: items, total: 0))
                   .then((value) => print('ok'))
                   .catchError((onError) => print(onError));
               _index = 2;

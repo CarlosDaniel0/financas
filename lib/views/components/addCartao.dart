@@ -1,14 +1,14 @@
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import '../../models/cartao.dart';
 import 'package:flutter/material.dart';
 import '../../util/convert.dart' as convert;
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 Future<void> addCartao(
-    {@required BuildContext context,
-    int id,
-    ItemCartao item,
-    Function(ItemCartao) onSubmit}) {
+    {BuildContext? context,
+    int? id,
+    ItemCartao? item,
+    Function(ItemCartao)? onSubmit}) {
   final _formKey = GlobalKey<FormState>();
   final _controllerParcela = TextEditingController();
   final _controllerValor =
@@ -28,7 +28,7 @@ Future<void> addCartao(
   }
 
   return showDialog(
-      context: context,
+      context: context!,
       builder: (context) {
         return Builder(
           builder: (context) {
@@ -46,7 +46,7 @@ Future<void> addCartao(
                           controller: _controllerParcela,
                           inputFormatters: [maskParcela],
                           validator: (text) {
-                            if (text.isEmpty) {
+                            if (text!.isEmpty) {
                               return 'Digite a parcela!';
                             }
 
@@ -60,7 +60,7 @@ Future<void> addCartao(
                           decoration: InputDecoration(labelText: 'Item'),
                           controller: _controllerItem,
                           validator: (text) {
-                            if (text.isEmpty) {
+                            if (text!.isEmpty) {
                               return 'Digite o nome do Item!';
                             }
                             return null;
@@ -87,7 +87,7 @@ Future<void> addCartao(
                           controller: _controllerValor,
                           keyboardType: TextInputType.number,
                           validator: (text) {
-                            if (text.isEmpty) {
+                            if (text!.isEmpty) {
                               return 'Digite o Valor!';
                             }
                             if (text.split(',').length != 2) {
@@ -108,8 +108,8 @@ Future<void> addCartao(
                       child: Text('Cancelar')),
                   TextButton(
                       onPressed: () {
-                        if (_formKey.currentState.validate()) {
-                          onSubmit(ItemCartao(
+                        if (_formKey.currentState!.validate()) {
+                          onSubmit!(ItemCartao(
                               item: _controllerItem.text,
                               parcela: _controllerParcela.text,
                               valor: isNegative

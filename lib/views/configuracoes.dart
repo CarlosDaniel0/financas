@@ -4,26 +4,26 @@ import '../models/conta.dart';
 import '../util/database.dart';
 
 class Configuracoes extends StatefulWidget {
-  Configuracoes({Key key, this.id}) : super(key: key);
+  Configuracoes({Key? key, required this.id}) : super(key: key);
   final String id;
   @override
   _ConfiguracoesState createState() => _ConfiguracoesState(id: id);
 }
 
 class _ConfiguracoesState extends State<Configuracoes> {
-  _ConfiguracoesState({this.id});
+  _ConfiguracoesState({required this.id});
   final String id;
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   List<bool> activeConta = [];
   List<bool> activeDetails = [];
-  SharedPreferences prefs;
+  late SharedPreferences prefs;
   DataBase db = DataBase();
-  Conta conta = Conta();
+  Conta conta = Conta(items: [], mes: '', ano: 0, total: 0);
   @override
   void initState() {
     _prefs.then((res) => prefs = res);
     db.getConta(id).then((v) {
-      conta = v;
+      conta = v!;
       getSelectedItems();
     });
     super.initState();
@@ -92,7 +92,7 @@ class _ConfiguracoesState extends State<Configuracoes> {
         selected: list[i],
         value: list[i],
         onChanged: (value) {
-          prefs.setBool(conta.items[i].nome, value);
+          prefs.setBool(conta.items[i].nome, value!);
           _setState(() => list[i] = value);
         },
       ));

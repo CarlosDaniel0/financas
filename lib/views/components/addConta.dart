@@ -2,37 +2,35 @@ import 'package:financas/models/conta.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import '../../util/convert.dart' as convert;
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 Future<void> addConta(
-    {@required BuildContext context,
-    int id,
-    ItemConta item,
-    Function(ItemConta) onSubmit}) {
+    {@required BuildContext? context,
+    int? id,
+    ItemConta? item,
+    Function(ItemConta)? onSubmit}) {
   final _formKey = GlobalKey<FormState>();
   final _controllerValor =
       MoneyMaskedTextController(decimalSeparator: ',', thousandSeparator: '.');
   final _controllerNome = TextEditingController();
-  Icon _icon = Icon(Icons.edit);
-  Color _currentColor = Colors.indigo;
+  if (item != null) {
+    _controllerNome.text = item.nome;
+    _controllerValor.text = convert.doubleToCurrency(item.valor);
+  }
+  var _icon = ValueNotifier<Icon>(Icon(item != null
+      ? IconData(item.icon['code'], fontFamily: 'MaterialIcons')
+      : Icons.edit));
+  Color _currentColor = item == null
+      ? Colors.indigo
+      : Color(int.parse('0xff${item.icon['color']}'));
   String title = item == null ? 'Adicionar Item' : 'Atualizar ${item.nome}';
 
   return showDialog(
-      context: context,
+      context: context!,
       builder: (context) {
         return Builder(builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
-            if (item != null) {
-              setState(() {
-                _currentColor = Color(int.parse('0xff${item.icon['color']}'));
-                _icon = Icon(
-                    IconData(item.icon['code'], fontFamily: 'MaterialIcons'));
-              });
-              _controllerNome.text = item.nome;
-              _controllerValor.text = convert.doubleToCurrency(item.valor);
-            }
-
             return AlertDialog(
               title: Text(title),
               content: SingleChildScrollView(
@@ -42,25 +40,24 @@ Future<void> addConta(
                     children: [
                       Row(children: [
                         Text('Icone: '),
-                        IconButton(
-                            icon: CircleAvatar(child: _icon),
-                            onPressed: () async {
-                              IconData icon =
-                                  await FlutterIconPicker.showIconPicker(
-                                context,
-                                adaptiveDialog: true,
-                                showTooltips: false,
-                                showSearchBar: true,
-                                iconPickerShape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20)),
-                                iconPackMode: IconPack.material,
-                              );
-                              if (icon != null) {
-                                setState(() {
-                                  _icon = Icon(icon);
-                                });
-                              }
-                            }),
+                        ValueListenableBuilder(
+                          valueListenable: _icon,
+                          builder: (ctx, value, child) => IconButton(
+                              icon: CircleAvatar(child: value as Widget),
+                              onPressed: () async {
+                                IconData? icon =
+                                    await FlutterIconPicker.showIconPicker(
+                                  context,
+                                  adaptiveDialog: true,
+                                  showTooltips: false,
+                                  showSearchBar: true,
+                                  iconPickerShape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  iconPackModes: [IconPack.material],
+                                );
+                                if (icon != null) _icon.value = Icon(icon);
+                              }),
+                        ),
                         Text('Cor: '),
                         IconButton(
                             color: _currentColor,
@@ -94,7 +91,7 @@ Future<void> addConta(
                         decoration: InputDecoration(labelText: 'Nome'),
                         controller: _controllerNome,
                         validator: (text) {
-                          if (text.isEmpty) {
+                          if (text!.isEmpty) {
                             return "Digite o nome do item";
                           }
                           return null;
@@ -105,7 +102,7 @@ Future<void> addConta(
                           decoration: InputDecoration(labelText: 'Valor'),
                           controller: _controllerValor,
                           validator: (text) {
-                            if (text.isEmpty) {
+                            if (text!.isEmpty) {
                               return "Digite o valor do item";
                             }
                             if (text.split(',').length != 2) {
@@ -125,11 +122,11 @@ Future<void> addConta(
                     child: Text('Cancelar')),
                 TextButton(
                     onPressed: () {
-                      if (_formKey.currentState.validate()) {
+                      if (_formKey.currentState!.validate()) {
                         // Atualizar valor
-                        onSubmit(ItemConta(
+                        onSubmit!(ItemConta(
                             icon: {
-                              'code': _icon.icon.codePoint,
+                              'code': _icon.value.icon!.codePoint,
                               'color':
                                   _currentColor.toString().substring(10, 16)
                             },

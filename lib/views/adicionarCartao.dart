@@ -5,18 +5,17 @@ import '../util/database.dart';
 import '../util/generate.dart' as gn;
 import '../models/conta.dart';
 import 'package:intl/intl.dart';
-import './components/addCartao.dart';
 import '../models/cartao.dart';
 
 class AdicionarCartao extends StatefulWidget {
-  AdicionarCartao({Key key, this.mes}) : super(key: key);
+  AdicionarCartao({Key? key, required this.mes}) : super(key: key);
   final String mes;
   @override
   _AdicionarCartaoState createState() => _AdicionarCartaoState(mes: mes);
 }
 
 class _AdicionarCartaoState extends State<AdicionarCartao> {
-  _AdicionarCartaoState({this.mes});
+  _AdicionarCartaoState({required this.mes});
   final String mes;
   Color _currentColorText = Colors.indigo;
   Color _currentColorBackground = Colors.red;
@@ -31,17 +30,18 @@ class _AdicionarCartaoState extends State<AdicionarCartao> {
   );
 
   Future<void> enviarCartao() async {
-    Conta conta = await db.getConta(mes);
+    Conta? conta = await db.getConta(mes);
     Cartao cartao = Cartao(
         descricao: [...itensCartao],
         nome: _controllerNome.text,
         style: {
           'background': _currentColorBackground.toString().substring(10, 16),
           'text': _currentColorText.toString().substring(10, 16)
-        });
+        },
+        total: 0);
 
     Map<String, dynamic> data =
-        gn.parcelas(mes, conta, _controllerId.text, cartao);
+        gn.parcelas(mes, conta!, _controllerId.text, cartao);
     db.runBatch(data);
     Navigator.pop(context);
   }

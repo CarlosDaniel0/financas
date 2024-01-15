@@ -1,15 +1,19 @@
 class Conta {
-  List items;
-  String mes;
-  int ano;
-  double total;
+  late List items;
+  late String mes;
+  late int ano;
+  late double total;
 
-  Conta({this.items, this.mes, this.ano, this.total});
+  Conta(
+      {required this.items,
+      required this.mes,
+      required this.ano,
+      required this.total});
   Conta.fromMap(Map<String, dynamic> map) {
     items = this.itemsFromList(map['items']);
     mes = map['mes'];
     ano = map['ano'];
-    total = map['total'];
+    total = double.parse(map['total'].toString());
   }
 
   Map<String, dynamic> toMap() {
@@ -66,15 +70,15 @@ class Conta {
 }
 
 class ItemConta {
-  Map icon;
-  String nome;
-  double valor;
+  late Map icon;
+  late String nome;
+  late double valor;
 
-  ItemConta({this.icon, this.nome, this.valor});
+  ItemConta({required this.icon, required this.nome, required this.valor});
   ItemConta.fromMap(Map<String, dynamic> map) {
     icon = map['icon'];
     nome = map['nome'];
-    valor = map['valor'];
+    valor = double.parse(map['valor'].toString());
   }
 
   Map<String, dynamic> toMap() {

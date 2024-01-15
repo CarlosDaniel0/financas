@@ -6,17 +6,17 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_charts/sparkcharts.dart';
 
 class Relatorio extends StatefulWidget {
-  Relatorio({Key key, this.ano}) : super(key: key);
+  Relatorio({Key? key, required this.ano}) : super(key: key);
   final int ano;
   @override
   _RelatorioState createState() => _RelatorioState(ano: ano);
 }
 
 class _RelatorioState extends State<Relatorio> {
-  _RelatorioState({this.ano});
+  _RelatorioState({required this.ano});
   final int ano;
   final db = DataBase();
-  Conta conta;
+  late Conta conta;
   List<QueryDocumentSnapshot> docs = [];
   Map cartoes = {};
   @override
@@ -53,7 +53,7 @@ class _RelatorioState extends State<Relatorio> {
                     legend: Legend(isVisible: true),
                     // Enable tooltip
                     tooltipBehavior: TooltipBehavior(enable: true),
-                    series: <ChartSeries<_SalesData, String>>[
+                    series: [
                       LineSeries<_SalesData, String>(
                           dataSource: data,
                           xValueMapper: (_SalesData sales, _) => sales.year,
@@ -71,30 +71,6 @@ class _RelatorioState extends State<Relatorio> {
                 axisCrossesAt: 24,
               ),
             )
-            // Container(
-            //   width: double.infinity,
-            //   height: 350,
-            //   child: SfSparkBarChart(
-            //     data: [],
-            //   ),
-            // )
-            // Padding(
-            //   padding: const EdgeInsets.all(8.0),
-            //   //Initialize the spark charts widget
-            //   child: SfSparkLineChart.custom(
-            //     //Enable the trackball
-            //     trackball: SparkChartTrackball(
-            //         activationMode: SparkChartActivationMode.tap),
-            //     //Enable marker
-            //     marker: SparkChartMarker(
-            //         displayMode: SparkChartMarkerDisplayMode.all),
-            //     //Enable data label
-            //     labelDisplayMode: SparkChartLabelDisplayMode.all,
-            //     xValueMapper: (int index) => data[index].year,
-            //     yValueMapper: (int index) => data[index].sales,
-            //     dataCount: 5,
-            //   ),
-            // )
           ],
         ),
       ),

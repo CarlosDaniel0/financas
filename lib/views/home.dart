@@ -25,14 +25,14 @@ class _HomeState extends State<Home> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   DateTime data = DateTime.now();
-  SharedPreferences prefs;
+  late SharedPreferences prefs;
   var f = new NumberFormat.currency(
     locale: 'pt_BR',
     symbol: 'R\$',
     decimalDigits: 2,
   );
   DataBase database = new DataBase();
-  int _anoSelecionado;
+  late int _anoSelecionado;
   @override
   void initState() {
     _prefs.then((value) => prefs = value);
@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     String now = DateFormat("yyyyMM").format(data);
 
-    return WillPopScope(
+    return PopScope(
         child: Scaffold(
           body: StreamBuilder(
               stream: database.streamFilterContas(_anoSelecionado),
@@ -54,10 +54,10 @@ class _HomeState extends State<Home> {
                 }
 
                 if (snapshot.hasError) {
-                  FirebaseException error = snapshot.error;
-                  return Center(child: Text(error.message));
+                  FirebaseException error = snapshot.error as FirebaseException;
+                  return Center(child: Text(error.message!));
                 }
-                QuerySnapshot query = snapshot.data;
+                QuerySnapshot query = snapshot.data as QuerySnapshot;
                 List<QueryDocumentSnapshot> docs = query.docs;
 
                 return DefaultTabController(
@@ -73,7 +73,7 @@ class _HomeState extends State<Home> {
                               for (final doc in docs)
                                 Tab(
                                     text:
-                                        '${doc.data()['mes']} ${doc.data()['ano']}')
+                                        '${(doc.data() as Map<String, dynamic>)['mes']} ${(doc.data() as Map<String, dynamic>)['ano']}')
                             ]),
                             actions: [
                               PopupMenuButton(onSelected: (selecao) {
@@ -117,22 +117,24 @@ class _HomeState extends State<Home> {
                               }),
                             ],
                           ),
-                          floatingActionButton: FloatingActionButton(
-                            child: Icon(Icons.add),
-                            onPressed: () async {
-                              String mes = generate
-                                  .proximoMes(docs[docs.length - 1].id)[0];
-                              int ano = generate
-                                  .proximoMes(docs[docs.length - 1].id)[1];
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) {
-                                return AdicionarConta(
-                                    id: '${int.parse(docs[docs.length - 1].id) + 1}',
-                                    mes: mes,
-                                    ano: ano);
-                              }));
-                            },
-                          ),
+                          floatingActionButton: docs.length < 12
+                              ? FloatingActionButton(
+                                  child: Icon(Icons.add),
+                                  onPressed: () async {
+                                    String mes = generate.proximoMes(
+                                        docs[docs.length - 1].id)[0];
+                                    int ano = generate.proximoMes(
+                                        docs[docs.length - 1].id)[1];
+                                    Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) {
+                                      return AdicionarConta(
+                                          id: '${int.parse(docs[docs.length - 1].id) + 1}',
+                                          mes: mes,
+                                          ano: ano);
+                                    }));
+                                  },
+                                )
+                              : SizedBox.shrink(),
                           body: TabBarView(
                             children: [
                               for (final doc in docs)
@@ -156,10 +158,12 @@ class _HomeState extends State<Home> {
 
                                               if (s.hasError) {
                                                 return Center(
-                                                    child: Text(s.error));
+                                                    child: Text(
+                                                        s.error as String));
                                               }
 
-                                              double totalCartoes = s.data;
+                                              double totalCartoes =
+                                                  s.data as double;
                                               return total(doc, totalCartoes);
                                             })
                                       ],
@@ -169,7 +173,7 @@ class _HomeState extends State<Home> {
                     }));
               }),
         ),
-        onWillPop: _onWillPop);
+        onPopInvoked: _onWillPop);
   }
 
   int calcularIndex(List<QueryDocumentSnapshot> docs, String now) {
@@ -185,7 +189,7 @@ class _HomeState extends State<Home> {
   }
 
   List<Widget> templateContas(QueryDocumentSnapshot doc) {
-    Conta conta = Conta.fromMap(doc.data());
+    Conta conta = Conta.fromMap(doc.data() as Map<String, dynamic>);
     List<Widget> docs = [];
     for (int i = 0; i < conta.items.length; i++) {
       docs.add(ListTile(
@@ -206,7 +210,7 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.do_disturb_on_sharp, color: Colors.red),
             onPressed: () async {
               await database.removeItemConta(doc.id, i);
-              ScaffoldMessenger.of(_scaffoldKey.currentContext).showSnackBar(
+              ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
                   SnackBar(
                       content: Text(
                           '${conta.items[i].nome} removido com sucesso!')));
@@ -218,7 +222,7 @@ class _HomeState extends State<Home> {
               item: conta.items[i],
               onSubmit: (itemConta) async {
                 await database.updateUnicoItemConta(doc.id, i, itemConta);
-                ScaffoldMessenger.of(_scaffoldKey.currentContext).showSnackBar(
+                ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
                     SnackBar(
                         content:
                             Text('${itemConta.nome} atualizado com sucesso!')));
@@ -232,8 +236,11 @@ class _HomeState extends State<Home> {
     return docs;
   }
 
-  Future<bool> _onWillPop() async {
-    return showDialog(
+  Future<void> _onWillPop(bool didPop) async {
+    if (didPop) {
+      return;
+    }
+    showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -287,7 +294,7 @@ class _HomeState extends State<Home> {
                         .toList(),
                     onChanged: (item) {
                       setState(() {
-                        this._anoSelecionado = item;
+                        this._anoSelecionado = item as int;
                         Navigator.of(context).pop();
                       });
                     },
@@ -304,7 +311,7 @@ class _HomeState extends State<Home> {
   }
 
   Widget total(QueryDocumentSnapshot data, double totalCartoes) {
-    Conta conta = Conta.fromMap(data.data());
+    Conta conta = Conta.fromMap(data.data() as Map<String, dynamic>);
     // double totalSemCarro =
     //     conta.total - conta.items[1].valor; // Deixar dinamicamente no futuro
     double total = totalCartoes + conta.total;
@@ -359,7 +366,7 @@ class _HomeState extends State<Home> {
           onTap: () {
             Clipboard.setData(
                 ClipboardData(text: '${convert.doubleToCurrency(total)}'));
-            ScaffoldMessenger.of(_scaffoldKey.currentContext).showSnackBar(
+            ScaffoldMessenger.of(_scaffoldKey.currentContext!).showSnackBar(
                 SnackBar(content: Text("${f.format(total)} copiado!")));
           },
         ),
@@ -374,7 +381,7 @@ class _HomeState extends State<Home> {
                 context: context,
                 onSubmit: (ItemConta item) async {
                   await database.insertItemConta(data.id, item);
-                  ScaffoldMessenger.of(_scaffoldKey.currentContext)
+                  ScaffoldMessenger.of(_scaffoldKey.currentContext!)
                       .showSnackBar(SnackBar(
                           content: Text('${item.nome} Inserido com sucesso!')));
                 });

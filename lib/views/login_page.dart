@@ -16,36 +16,26 @@ class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   Future<bool> signInWithGoogle(ScaffoldState state) async {
-    GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-    if (googleSignInAccount == null) {
-      ScaffoldMessenger.of(state.context)
-          .showSnackBar(SnackBar(content: Text('Login Cancelado!')));
-      //state.showSnackBar(SnackBar(content: Text('Login Cancelado!')));
-    } else {
-      final GoogleSignInAuthentication googleSignInAuthentication =
-          await googleSignInAccount.authentication;
+    GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount!.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
-          accessToken: googleSignInAuthentication.accessToken,
-          idToken: googleSignInAuthentication.idToken);
-      ScaffoldMessenger.of(state.context).showSnackBar(
-          SnackBar(content: Text('Login efetuado com sucesso! Aguarde...')));
+    final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken);
+    ScaffoldMessenger.of(state.context).showSnackBar(
+        SnackBar(content: Text('Login efetuado com sucesso! Aguarde...')));
 
-      final UserCredential authRequest =
-          await _auth.signInWithCredential(credential);
-      final User user = authRequest.user;
+    final UserCredential authRequest =
+        await _auth.signInWithCredential(credential);
+    final User? user = authRequest.user;
 
-      if (user != null) {
-        assert(!user.isAnonymous);
-        assert(await user.getIdToken() != null);
-        final User currentUser = _auth.currentUser;
-        assert(user.uid == currentUser.uid);
-        print('Sign In with Google succeeded: $user ');
-      }
-      return true;
-    }
-
-    return false;
+    assert(!user!.isAnonymous);
+    assert(await user!.getIdToken() != null);
+    final User currentUser = _auth.currentUser!;
+    assert(user!.uid == currentUser.uid);
+    print('Sign In with Google succeeded: $user ');
+    return true;
   }
 
   // void signOutGoogle() async {
@@ -77,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _signInButton() {
     return OutlinedButton(
       onPressed: () {
-        signInWithGoogle(_scaffoldKey.currentState).then((result) => {
+        signInWithGoogle(_scaffoldKey.currentState!).then((result) => {
               if (result)
                 {
                   Navigator.pushAndRemoveUntil(

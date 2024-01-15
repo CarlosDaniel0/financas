@@ -95,7 +95,7 @@ List<dynamic> proximoMes(String id) {
   return [proxMes, ano];
 }
 
-List calculaMes(String id, int max) {
+List<Map<String, dynamic>> calculaMes(String id, int max) {
   int mes = int.parse(id.substring(4, 6));
   int ano = int.parse(id.substring(0, 4));
   List meses = [

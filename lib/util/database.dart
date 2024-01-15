@@ -24,17 +24,17 @@ class DataBase {
 
   Future<void> insertItemConta(String id, ItemConta item) async {
     DocumentSnapshot doc = await db.doc(id).get();
-    Conta conta = Conta.fromMap(doc.data());
+    Conta conta = Conta.fromMap(doc.data() as Map<String, dynamic>);
     conta.addItem(item);
     await db.doc(id).set(conta.toMap());
   }
 
-  Future<Conta> getConta(String id) async {
+  Future<Conta?> getConta(String id) async {
     DocumentSnapshot doc = await db.doc(id).get();
     if (!doc.exists) {
       return null;
     } else {
-      return Conta.fromMap(doc.data());
+      return Conta.fromMap(doc.data() as Map<String, dynamic>);
     }
   }
 
@@ -45,7 +45,7 @@ class DataBase {
   Future<void> updateUnicoItemConta(
       String id, int index, ItemConta itemConta) async {
     DocumentSnapshot doc = await db.doc(id).get();
-    Conta conta = Conta.fromMap(doc.data());
+    Conta conta = Conta.fromMap(doc.data() as Map<String, dynamic>);
     conta.updateItem(index, itemConta);
     await db.doc(id).update(conta.toMap());
   }
@@ -68,7 +68,7 @@ class DataBase {
 
   Future<void> removeItemConta(String id, int index) async {
     DocumentSnapshot doc = await db.doc(id).get();
-    Conta conta = Conta.fromMap(doc.data());
+    Conta conta = Conta.fromMap(doc.data() as Map<String, dynamic>);
     conta.removeItem(index);
     await db.doc(id).set(conta.toMap());
   }
@@ -87,13 +87,13 @@ class DataBase {
     await db.doc(id).collection('cartoes').doc(idCartao).set(cartao.toMap());
   }
 
-  Future<Cartao> getCartao(String id, String cartao) async {
+  Future<Cartao?> getCartao(String id, String cartao) async {
     DocumentSnapshot doc =
         await db.doc(id).collection('cartoes').doc(cartao).get();
     if (!doc.exists) {
       return null;
     } else {
-      return Cartao.fromJson(doc.data());
+      return Cartao.fromJson(doc.data() as Map<String, dynamic>);
     }
   }
 
@@ -110,7 +110,8 @@ class DataBase {
     List<QueryDocumentSnapshot> docs = query.docs;
     double total = 0;
     docs.forEach((cartao) {
-      total += double.parse(cartao.data()['total'].toString());
+      total += double.parse(
+          (cartao.data() as Map<String, dynamic>)['total'].toString());
     });
     return total;
   }
@@ -127,7 +128,7 @@ class DataBase {
       String id, String cartao, ItemCartao item) async {
     DocumentSnapshot snapshot =
         await db.doc(id).collection('cartoes').doc(cartao).get();
-    Cartao data = Cartao.fromJson(snapshot.data());
+    Cartao data = Cartao.fromJson(snapshot.data() as Map<String, dynamic>);
     data.addItem(item);
     await db.doc(id).collection('cartoes').doc(cartao).set(data.toMap());
   }
@@ -136,7 +137,7 @@ class DataBase {
       String id, String cartao, int index, ItemCartao item) async {
     DocumentSnapshot snapshot =
         await db.doc(id).collection('cartoes').doc(cartao).get();
-    Cartao data = Cartao.fromJson(snapshot.data());
+    Cartao data = Cartao.fromJson(snapshot.data() as Map<String, dynamic>);
     data.updateItem(index, item);
     await db.doc(id).collection('cartoes').doc(cartao).update(data.toMap());
   }
@@ -166,12 +167,12 @@ class DataBase {
   Future<void> removeItemCartao(String id, String cartao, int index) async {
     DocumentSnapshot snapshot =
         await db.doc(id).collection('cartoes').doc(cartao).get();
-    Cartao data = Cartao.fromJson(snapshot.data());
+    Cartao data = Cartao.fromJson(snapshot.data() as Map<String, dynamic>);
     data.removeItem(index);
     await db.doc(id).collection('cartoes').doc(cartao).update(data.toMap());
 
-    Cartao checkCartao = await getCartao(id, cartao);
-    if (checkCartao.descricao.length == 0) {
+    Cartao? checkCartao = await getCartao(id, cartao);
+    if (checkCartao!.descricao.length == 0) {
       removeCartao(id, cartao);
     }
   }
@@ -192,8 +193,8 @@ class DataBase {
   Future<void> insertAnos(int ano) async {
     CollectionReference anos = FirebaseFirestore.instance.collection('anos');
     DocumentSnapshot doc = await anos.doc('ids').get();
-    bool exists;
-    for (var i in doc.data()['docs']) {
+    bool exists = false;
+    for (var i in (doc.data() as Map<String, dynamic>)['docs']) {
       if (ano == i) {
         exists = true;
       } else {
@@ -210,6 +211,6 @@ class DataBase {
   Future<List> getAnos() async {
     CollectionReference anos = FirebaseFirestore.instance.collection('anos');
     DocumentSnapshot doc = await anos.doc('ids').get();
-    return doc.data()['docs'];
+    return (doc.data() as Map<String, dynamic>)['docs'];
   }
 }

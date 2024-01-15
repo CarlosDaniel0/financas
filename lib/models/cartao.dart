@@ -1,10 +1,14 @@
 class Cartao {
-  String nome;
-  List descricao;
-  Map style;
-  double total;
+  late String nome;
+  late List descricao;
+  late Map style;
+  late double total;
 
-  Cartao({this.nome, this.descricao, this.style, this.total});
+  Cartao(
+      {required this.nome,
+      required this.descricao,
+      required this.style,
+      required this.total});
   Cartao.fromJson(Map<String, dynamic> json) {
     nome = json['nome'];
     descricao = this.itemsFromList(json['descricao']);
@@ -74,11 +78,11 @@ class Cartao {
 }
 
 class ItemCartao {
-  String item;
-  String parcela;
-  double valor;
+  late String item;
+  late String parcela;
+  late double valor;
 
-  ItemCartao({this.item, this.parcela, this.valor});
+  ItemCartao({required this.item, required this.parcela, required this.valor});
 
   ItemCartao.fromJSON(Map<String, dynamic> json) {
     item = json['item'];
