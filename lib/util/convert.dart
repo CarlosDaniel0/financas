@@ -2,7 +2,7 @@
 ///
 /// Recebe um valor string no formato
 /// ``` dart
-/// String valor = '1000,00'
+/// String valor = '1.000,00'
 /// ```
 /// e retorna um valor tipo double
 /// ``` dart
@@ -10,7 +10,7 @@
 /// ```
 double currencyToDouble(String value) {
   List<String> result = value.split(',');
-  return double.parse('${result[0]}.${result[1]}');
+  return double.parse('${result[0].split('.').join('')}.${result[1]}');
 }
 
 /// Converte a moeda do padrão 🇺🇸USD para o 🇧🇷BRL
